@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SuperShop.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +25,17 @@ namespace SuperShop
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<DataContext>(cfg => //cria o servico dbContext, insere o data context
+            {
+                cfg.UseSqlServer(this.Configuration.GetConnectionString("DefaultConnection")); //estipular a bd a usar e conecta ao json
+            });
+
+            services.AddTransient<SeedDB>();//quando for invocado o seed, é entao criado
             services.AddControllersWithViews();
+
+            //add.Singleton usado para estar sempre disponivel memória, nunca é destruido - ocupa mt memoria
+
+            //add.Scope - qlq objecto criado(fica criado e instanciado) é sobreposto pelo sucessor
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
